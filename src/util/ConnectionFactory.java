@@ -1,3 +1,5 @@
+// UTIL - classes utilitárias
+
 package util;
 
 import java.sql.Connection;
