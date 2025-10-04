@@ -2,24 +2,31 @@
 
 package model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Tarefa {
-    private int  id;
+    private int id;
     private String titulo;
     private String descricao;
-    private String status;
-    private LocalDateTime data_criacao;
-    private LocalDateTime data_conclusao;
+    private StatusTarefa status;
+    private LocalDateTime dataCriacao;
+    private LocalDate dataVencimento; // Apenas data, sem hora
+    private LocalDateTime dataConclusao; // Data e hora
+    private int idUsuario; // Chave estrangeira para o usuário
 
     public Tarefa(){} // útil para quando você cria um objeto e só depois preenche com setters.
 
-    public Tarefa(String titulo, String descricao, String stauts, LocalDateTime data_criacao, LocalDateTime data_conclusao) {
+    public Tarefa(int id, String titulo, String descricao, StatusTarefa status, LocalDateTime dataCriacao,
+                  LocalDate dataVencimento, LocalDateTime dataConclusao, int idUsuario) {
+        this.id = id;
         this.titulo = titulo;
         this.descricao = descricao;
-        this.status = stauts;
-        this.data_criacao = data_criacao;
-        this.data_conclusao = data_conclusao;
+        this.status = status;
+        this.dataCriacao = dataCriacao;
+        this.dataVencimento = dataVencimento;
+        this.dataConclusao = dataConclusao;
+        this.idUsuario = idUsuario;
     }
 
     public String getTitulo() {
@@ -38,27 +45,55 @@ public class Tarefa {
         this.descricao = descricao;
     }
 
-    public String getStatus() {
+    public StatusTarefa getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusTarefa status) {
         this.status = status;
     }
 
-    public LocalDateTime getData_criacao() {
-        return data_criacao;
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
     }
 
-    public void setData_criacao(LocalDateTime data_criacao) {
-        this.data_criacao = data_criacao;
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao;
     }
 
-    public LocalDateTime getData_conclusao() {
-        return data_conclusao;
+    public LocalDate getDataVencimento() {
+        return dataVencimento;
     }
 
-    public void setData_conclusao(LocalDateTime data_conclusao) {
-        this.data_conclusao = data_conclusao;
+    public void setDataVencimento(LocalDate dataVencimento) {
+        this.dataVencimento = dataVencimento;
     }
+
+    public LocalDateTime getDataConclusao() {
+        return dataConclusao;
+    }
+
+    public void setDataConclusao(LocalDateTime dataConclusao) {
+        this.dataConclusao = dataConclusao;
+    }
+
+    public int getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
+    @Override
+    public String toString() {
+        return "Tarefa{" +
+                "id=" + id +
+                ", titulo='" + titulo + '\'' +
+                ", status='" + status + '\'' +
+                ", dataVencimento=" + dataVencimento +
+                ", idUsuario=" + idUsuario +
+                '}';
+    }
+
 }

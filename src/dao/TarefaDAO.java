@@ -22,7 +22,7 @@ public class TarefaDAO {
                                                                 //Com o PreparedStatement escrevemos o SQL com ? (placeholders) e depois passa os valores
             stmt.setString(1, tarefa.getTitulo());
             stmt.setString(2, tarefa.getDescricao());
-            stmt.setString(3, tarefa.getStatus());
+//            stmt.setString(3, tarefa.getStatus());
             //stmt.setDate(4, Date.valueOf(tarefa.getData_criacao()));
             //stmt.setDate(5, Date.valueOf(tarefa.getData_conclusao()));
         } catch (SQLException e) {
