@@ -1,6 +1,6 @@
 -- Passo 1: Apaga o banco de dados existente.
 -- O "IF EXISTS" é uma segurança para não dar erro se o banco de dados ainda não tiver sido criado.
-DROP DATABASE IF EXISTS todolist;
+DROP DATABASE IF EXISTS todo_list_db;
 
 -- Passo 2: Cria um banco de dados limpo e novo.
 CREATE DATABASE todo_list_db;

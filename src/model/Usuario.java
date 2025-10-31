@@ -45,4 +45,12 @@ public class Usuario {
                 ", login='" + login + '\'' +
                 '}';
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }
