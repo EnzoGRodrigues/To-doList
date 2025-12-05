@@ -8,6 +8,7 @@ import model.Usuario;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,9 @@ public class TelaPrincipal extends JFrame {
     private JButton btnNovaTarefa;
     private JButton btnEditar;
     private JButton btnExcluir;
+    private JButton btnConcluir;
+    private JButton btnBuscar;
+    private JTextField txtBusca;
     private JComboBox<String> comboFiltroStatus;
     private JLabel lblBoasVindas;
     private DefaultTableModel tableModel; // O modelo de tabela padrão
@@ -79,6 +83,17 @@ public class TelaPrincipal extends JFrame {
 
         painelSuperior.add(painelFiltros, BorderLayout.EAST);
         add(painelSuperior, BorderLayout.NORTH);
+
+        //painel de busca
+
+        JPanel painelBusca = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        painelBusca.add(new JLabel("Buscar"));
+        txtBusca = new JTextField(15);
+        painelBusca.add(txtBusca);
+        JButton btnBuscar = new JButton("OK");
+        painelBusca.add(btnBuscar);
+
+        painelSuperior.add(painelBusca, BorderLayout.CENTER);
     }
 
     private void criarPainelCentral() {
@@ -119,15 +134,18 @@ public class TelaPrincipal extends JFrame {
         btnNovaTarefa = new JButton("Nova Tarefa");
         btnEditar = new JButton("Editar");
         btnExcluir = new JButton("Excluir");
+        btnConcluir = new JButton("Concluir");
 
         Dimension btnSize = new Dimension(120, 40);
         btnNovaTarefa.setPreferredSize(btnSize);
         btnEditar.setPreferredSize(btnSize);
         btnExcluir.setPreferredSize(btnSize);
+        btnConcluir.setPreferredSize(btnSize);
 
         painelBotoes.add(btnNovaTarefa);
         painelBotoes.add(btnEditar);
         painelBotoes.add(btnExcluir);
+        painelBotoes.add(btnConcluir);
 
         add(painelBotoes, BorderLayout.EAST);
     }
@@ -139,6 +157,8 @@ public class TelaPrincipal extends JFrame {
         btnNovaTarefa.addActionListener(e -> acaoNovaTarefa());
         btnEditar.addActionListener(e -> acaoEditar());
         btnExcluir.addActionListener(e -> acaoExcluir());
+        btnConcluir.addActionListener(e -> acaoConcluirRapido());
+        btnBuscar.addActionListener(e -> carregarTarefas());
     }
 
     /**
@@ -147,18 +167,23 @@ public class TelaPrincipal extends JFrame {
     public void carregarTarefas() {
         // 1. Pega o valor do filtro
         String filtroSelecionado = (String) comboFiltroStatus.getSelectedItem();
+        String termoBusca = txtBusca.getText().trim().toLowerCase(); // Pega o texto da busca
 
         // 2. Busca TODAS as tarefas do usuário no banco
         List<Tarefa> todasTarefas = tarefaDAO.listarPorUsuario(usuarioLogado.getId());
 
         // 3. Filtra a lista em Java
-        if (filtroSelecionado.equals("Todos")) {
-            this.tarefasNaTabela = todasTarefas; // Guarda a lista filtrada
-        } else {
-            this.tarefasNaTabela = todasTarefas.stream()
-                    .filter(t -> t.getStatus().getValorSql().equals(filtroSelecionado))
-                    .collect(Collectors.toList());
-        }
+        this.tarefasNaTabela = todasTarefas.stream()
+                .filter(t -> {
+                    // 1. Verifica o Status
+                    boolean statusOk = filtroSelecionado.equals("Todos") || t.getStatus().getValorSql().equals(filtroSelecionado);
+
+                    // 2. Verifica a Busca (se o título contém o que foi digitado)
+                    boolean buscaOk = termoBusca.isEmpty() || t.getTitulo().toLowerCase().contains(termoBusca);
+
+                    return statusOk && buscaOk;
+                })
+                .collect(Collectors.toList());
 
         // 4. Limpar o modelo da tabela (remove linhas antigas)
         tableModel.setRowCount(0);
@@ -229,6 +254,33 @@ public class TelaPrincipal extends JFrame {
             carregarTarefas();
             JOptionPane.showMessageDialog(this, "Tarefa excluída com sucesso!");
         }
+    }
+
+    private void acaoConcluirRapido() {
+        int linhaSelecionada = tabelaTarefas.getSelectedRow();
+        if (linhaSelecionada == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione uma tarefa para concluir.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Tarefa tarefa = tarefasNaTabela.get(linhaSelecionada);
+
+        // Se já estiver concluída, não faz nada
+        if (tarefa.getStatus() == StatusTarefa.CONCLUIDA) {
+            JOptionPane.showMessageDialog(this, "Esta tarefa já está concluída!");
+            return;
+        }
+
+        // Atualiza o objeto
+        tarefa.setStatus(StatusTarefa.CONCLUIDA);
+        tarefa.setDataConclusao(LocalDateTime.now());
+
+        // Salva no banco
+        tarefaDAO.atualizar(tarefa);
+
+        // Atualiza a tela
+        carregarTarefas();
+        JOptionPane.showMessageDialog(this, "Tarefa concluída! Parabéns!");
     }
 
     // --- Métod.o Main (Apenas para TESTAR esta tela isoladamente) ---
